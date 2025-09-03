@@ -1,0 +1,13 @@
+{
+  "is-main": true,
+  "import": [
+    {
+      "path": "moonbitlang/x/fs",
+      "alias": "fs"
+    },
+    {
+      "path": "moonbitlang/x/sys",
+      "alias": "sys"
+    },
+  ]
+}
