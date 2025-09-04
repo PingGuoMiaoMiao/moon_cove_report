@@ -1,4 +1,3 @@
-// 修改主函数
 fn main {
   // 获取命令行参数
   let args = @sys.get_cli_args()
@@ -45,9 +44,29 @@ fn main {
     }
   }
   
-  // 加载源代码文件
+  // 加载源代码文件 - 使用改进的函数
+  println("🔄 加载源代码文件...")
   let source_files = load_source_files(coverage_data, source_dir)
-  println("✅ Loaded " + source_files.size().to_string() + " source files")
+  println("✅ 加载 " + source_files.size().to_string() + " 个源文件")
+  
+  // 如果加载的源文件数量少于覆盖率文件数量，尝试备用方法
+  if source_files.size() < coverage_data.files.size() {
+    println("⚠️ 警告: 部分源文件未找到，尝试备用方法...")
+    
+    // 尝试使用相对路径
+    let relative_source_dir = "src" // 或者从覆盖率数据中推断
+    let alt_source_files = load_source_files(coverage_data, relative_source_dir)
+    
+    // 合并找到的源文件
+    alt_source_files.each(fn(filename: String, content: String) {
+      if !source_files.contains(filename) {
+        source_files.set(filename, content)
+        println("✅ 备用方法找到文件: " + filename)
+      }
+    })
+    
+    println("🔄 最终加载 " + source_files.size().to_string() + " 个源文件")
+  }
   
   // 生成行视图
   let views = map_to_line_view(coverage_data, source_files)
@@ -120,11 +139,32 @@ fn generate_safe_filename(filename: String) -> String {
 // util.mbt
 // 路径处理辅助函数
 pub fn join_path(path1: String, path2: String) -> String {
-  if path1.strip_suffix("/") != None {
-    path1 + path2
-  } else {
-    path1 + "/" + path2
-  }
+    // 处理空路径
+    if path1.is_empty() {
+        return path2
+    }
+    if path2.is_empty() {
+        return path1
+    }
+    
+    // 标准化路径分隔符
+    let p1 = path1.replace(old = "\\", new = "/")
+    let p2 = path2.replace(old = "\\", new = "/")
+    
+    // 移除 path1 末尾的分隔符
+    let p1_clean = match p1.strip_suffix("/") {
+        Some(stripped) => stripped.to_string()
+        None => p1
+    }
+    
+    // 移除 path2 开头的分隔符
+    let p2_clean = match p2.starts_with("/") {
+        Some(_) => p2.substring(start = 1)
+        None => p2
+    }
+    
+    // 使用统一的分隔符拼接路径
+    p1_clean + "/" + p2_clean
 }
 
 pub fn dirname(path: String) -> String {
@@ -168,28 +208,94 @@ pub fn read_coverage_file(path: String) -> Result[CoverageData, String] {
 }
 
 pub fn load_source_files(data: CoverageData, source_dir: String) -> Map[String, String] {
-  let  source_map = Map::new()
-  
-  for filename in data.files.keys() {
-    // 处理 OCaml 的特殊情况
-    let source_file = match filename.strip_suffix(".re.ml") {
-      Some(prefix) => prefix.to_string() // 转换为 String
-      None => filename
-    }
+    let source_map = Map::new()
     
-    // 使用自定义的路径拼接函数
-    let file_path = join_path(source_dir, source_file)
+    // 使用 each 方法遍历文件
+    data.files.each(fn(filename: String, coverage: FileCoverage) {
+        // 尝试多种可能的路径格式
+        let possible_paths = [
+            // 1. 直接使用文件名
+            filename,
+            // 2. 移除可能的路径前缀
+            filename.replace(old = "src/", new = ""),
+            filename.replace(old = "src\\", new = ""),
+            // 3. 只保留文件名部分
+            basename(filename),
+            // 4. 尝试不同扩展名
+            filename.replace(old = ".mbt", new = ".ml"),
+            filename.replace(old = ".ml", new = ".mbt"),
+            // 5. 尝试不同路径分隔符
+            filename.replace(old = "/", new = "\\"),
+            filename.replace(old = "\\", new = "/"),
+        ]
+        
+        let mut found = false
+        
+        for path in possible_paths {
+            // 使用自定义的路径拼接函数
+            let file_path = join_path(source_dir, path)
+            
+            try {
+                let content = @fs.read_file_to_string(file_path)
+                source_map.set(filename, content)
+                println("✅ 找到源文件: " + file_path)
+                found = true
+                break
+            } catch {
+                IOError(_) => ignore(())
+            }
+        }
+        
+        if !found {
+            println("⚠️ 警告: 源文件未找到: " + filename)
+            // 尝试在源代码目录中搜索文件名
+            match find_file_in_directory(source_dir, basename(filename)) {
+                Some(found_path) => {
+                    try {
+                        let content = @fs.read_file_to_string(found_path)
+                        source_map.set(filename, content)
+                        println("✅ 在 " + found_path + " 找到匹配文件")
+                    } catch {
+                        IOError(msg) => println("⚠️ 警告: 无法读取找到的文件: " + found_path + ", " + msg)
+                    }
+                }
+                None => println("❌ 错误: 未找到任何匹配文件")
+            }
+        }
+    })
     
+    source_map
+}
+
+// 辅助函数：在目录中递归查找文件
+fn find_file_in_directory(dir_path: String, filename: String) -> Option[String] {
     try {
-      let content = @fs.read_file_to_string(file_path)
-      // 使用 put 方法添加元素
-      source_map[filename] = content
+        let entries = @fs.read_dir(dir_path)
+        for entry in entries {
+            if @fs.is_dir(entry) {
+                match find_file_in_directory(entry, filename) {
+                    Some(path) => return Some(path)
+                    None => ignore(())
+                }
+            } else if basename(entry) == filename {
+                return Some(entry)
+            }
+        }
+        None
     } catch {
-      IOError(msg) => println("Warning: Source file not found: " + filename + ", error: " + msg)
+        IOError(_) => None
     }
-  }
-  
-  source_map
+}
+
+// 辅助函数：获取文件名部分
+fn basename(path: String) -> String {
+    match path.rev().find("/") {
+        Some(pos) => path.substring(start = path.length() - pos)
+        None => match path.rev().find("\\") {
+            Some(pos) => path.substring(start = path.length() - pos)
+            None => path
+        }
+    }
 }
 
 pub fn save_report(report_html: String, output_path: String) -> Result[Unit, String] {
