@@ -14,21 +14,38 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
       
+      # 修复 Moonbit 设置
       - name: Setup MoonBit
         uses: hustcer/setup-moonbit@develop
-        with:
-          version: stable
+        # 移除了 version: stable 参数
           
       - name: Install dependencies
         run: |
           moon update
           moon install
           
-      - name: Run tests with coverage
-        run: moon test --enable-coverage --target native
-        
+      # 添加调试步骤
+      - name: Run tests with coverage (debug)
+        run: |
+          echo "Current directory: $(pwd)"
+          echo "Running tests with coverage..."
+          moon test --enable-coverage --target native
+          
+          echo "Generated coverage files:"
+          find . -name "moonbit_coverage_*" -ls || echo "No coverage files found"
+          
+          echo "Directory contents:"
+          ls -laR
+          
       - name: Generate coverage report
-        run: moon coverage report -f lcov -o coverage.lcov
+        run: |
+          # 确保覆盖率文件存在
+          if [ ! -f moonbit_coverage_* ]; then
+            echo "Error: Coverage files not found!"
+            exit 1
+          fi
+          
+          moon coverage report -f lcov -o coverage.lcov
         
       - name: Generate HTML report
         run: moon run main coverage.lcov src/ reports/
