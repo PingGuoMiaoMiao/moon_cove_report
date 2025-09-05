@@ -2,8 +2,8 @@
 
 [English](https://github.com/PingGuoMiaoMiao/moon_cove_report/blob/main/README.md) |[简体中文](https://github.com/PingGuoMiaoMiao/moon_cove_report/blob/main/README_zh_CN.md)
 
-[![Build Status](https://img.shields.io/github/actions/workflow/status/moonbit-community/sw-socket/check.yaml)](https://github.com/moonbit-community/sw-socket/actions)
-[![License](https://img.shields.io/github/license/moonbit-community/sw-socket)](LICENSE)
+[![Build Status](https://img.shields.io/github/actions/workflow/status//PingGuoMiaoMiao/moon_cove_report/check.yaml)](https://github.com//PingGuoMiaoMiao/moon_cove_report/actions)
+[![License](https://img.shields.io/github/license//PingGuoMiaoMiao/moon_cove_report)](LICENSE)
 
 
 
@@ -43,6 +43,8 @@ moon run main coverage.lcov src/ reports/
 | coverage_path | Bisect 覆盖率文件路径 | coverage.lcov |
 | source_dir    | 源代码目录           | src/         |
 | output_dir    | 报告输出目录         | reports/     |
+
+reports/
 
 ## 🔍 查看报告
 # 报告生成后，打开输出目录中的 index.html文件：

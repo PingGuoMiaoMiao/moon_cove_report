@@ -1,0 +1,87 @@
+name: CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  check:
+    strategy:
+      matrix:
+        os:
+          - name: ubuntu-latest
+            version: stable
+          - name: macos-latest
+            version: stable
+          - name: windows-latest
+            version: stable
+          
+          # Bleeding edge checks
+          - name: ubuntu-latest
+            version: bleeding
+          - name: macos-latest
+            version: bleeding
+          - name: windows-latest
+            version: bleeding
+
+      fail-fast: false
+    runs-on: ${{ matrix.os.name }}
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup MoonBit
+        uses: hustcer/setup-moonbit@develop
+        with:
+          version: ${{ matrix.os.version }}
+          
+      - name: MoonBit version
+        run: |
+          moon version --all
+          moonrun --version
+          
+      - name: Install dependencies
+        run: |
+          moon update
+          moon install
+          
+      - name: Check code
+        run: moon check --deny-warn --target native
+        
+      - name: Format check
+        run: |
+          moon fmt
+          git diff --exit-code
+          
+      - name: Run tests
+        run: moon test --target native
+        
+      - name: Run release tests
+        run: moon test --target native --release
+        
+      - name: Run doc tests
+        run: moon test --doc
+          
+  json-format-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Check JSON format
+        run: |
+          for f in $(find . -name "moon.*.json"); do
+            if ! jq '.' $f > /dev/null; then
+              echo "Invalid JSON format in $f"
+              exit 1
+            fi
+          done
+          
+  typo-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Check typos
+        uses: crate-ci/typos@v1.19.0

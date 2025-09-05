@@ -1,0 +1,54 @@
+name: Coverage Report
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup MoonBit
+        uses: hustcer/setup-moonbit@develop
+        with:
+          version: stable
+          
+      - name: Install dependencies
+        run: |
+          moon update
+          moon install
+          
+      - name: Run tests with coverage
+        run: moon test --enable-coverage --target native
+        
+      - name: Generate coverage report
+        run: moon coverage report -f lcov -o coverage.lcov
+        
+      - name: Generate HTML report
+        run: moon run main coverage.lcov src/ reports/
+        
+      - name: Upload to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: coverage.lcov
+          flags: unittests
+          name: coverage-report
+          fail_ci_if_error: false
+          
+      - name: Upload HTML report artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-report
+          path: reports/
+          
+      - name: Deploy to GitHub Pages
+        if: github.ref == 'refs/heads/main'
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: reports/

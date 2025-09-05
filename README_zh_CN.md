@@ -2,8 +2,8 @@
 
 [English](https://github.com/PingGuoMiaoMiao/moon_cove_report/blob/main/README.md) |[简体中文](https://github.com/PingGuoMiaoMiao/moon_cove_report/blob/main/README_zh_CN.md)
 
-[![Build Status](https://img.shields.io/github/actions/workflow/status/moonbit-community/sw-socket/check.yaml)](https://github.com/moonbit-community/sw-socket/actions)
-[![License](https://img.shields.io/github/license/moonbit-community/sw-socket)](LICENSE)
+[![Build Status](https://img.shields.io/github/actions/workflow/status//PingGuoMiaoMiao/moon_cove_report/check.yaml)](https://github.com//PingGuoMiaoMiao/moon_cove_report/actions)
+[![License](https://img.shields.io/github/license//PingGuoMiaoMiao/moon_cove_report)](LICENSE)
 
 
 
