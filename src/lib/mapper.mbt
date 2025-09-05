@@ -6,7 +6,7 @@ struct LineMapEntry {
 }
 
 ///|
-fn build_line_map(source : String) -> @list.List[LineMapEntry] {
+pub fn build_line_map(source : String) -> @list.List[LineMapEntry] {
   println("开始构建行映射表...")
   let mut entries : @list.List[LineMapEntry] = @list.empty()
   let mut current_offset = 0

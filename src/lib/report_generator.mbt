@@ -1,4 +1,5 @@
 // 修改 generate_html_report 函数以生成完整的覆盖率报告
+
 ///|
 pub fn generate_html_report(
   views : @list.List[FileCoverageView],

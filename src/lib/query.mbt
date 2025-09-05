@@ -1,5 +1,6 @@
 // query.mbt
 // 查询点位执行次数
+
 ///|
 pub fn get_point_execution(
   data : CoverageData,

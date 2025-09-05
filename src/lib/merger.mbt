@@ -1,4 +1,5 @@
 // merger.mbt
+
 ///|
 pub fn merge_coverage(a : CoverageData, b : CoverageData) -> CoverageData {
   // 创建 a.files 的副本

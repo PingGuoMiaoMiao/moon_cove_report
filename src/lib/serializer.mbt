@@ -1,4 +1,5 @@
 // serializer.mbt
+
 ///|
 pub fn serialize_bisect(data : CoverageData) -> String {
   let buffer = StringBuilder::new()
