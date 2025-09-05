@@ -1,8 +1,3 @@
-import parser
-import merger
-import coverage_data
-import test
-
 fn create_file(name: String, points: List<coverage_data::CoveragePoint>) -> coverage_data::FileCoverage {
   let covered = points.count(fn(p) { p.count > 0 })
   coverage_data::FileCoverage {

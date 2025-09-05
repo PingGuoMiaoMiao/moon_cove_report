@@ -8,6 +8,9 @@
     {
       "path": "moonbitlang/x/sys",
       "alias": "sys"
-    },
+    },{
+      "path": "moonbit-community/mooncove/lib",
+      "alias": "cove"
+    }
   ]
 }

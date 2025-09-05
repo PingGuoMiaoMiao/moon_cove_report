@@ -12,25 +12,42 @@ type CoverageData
 type LineCoverage
 type FileCoverage
 type LineMapEntry
+fn generate_safe_filename(filename: String) -> String
+fn join_path(path1: String, path2: String) -> String
+fn dirname(path: String) -> String
+fn read_coverage_file(path: String) -> Result[CoverageData, String]
+fn load_source_files(data: CoverageData, source_dir: String) -> Map[String, String]
+fn find_file_in_directory(dir_path: String, filename: String) -> Option[String]
+fn basename(path: String) -> String
+fn save_report(report_html: String, output_path: String) -> Result[Unit, String]
+fn ensure_output_dir_exists(output_path: String) -> Result[Unit, String]
+fn serialize_bisect(data: CoverageData) -> String
+fn generate_html_report(views: @list.List[FileCoverageView], coverage_data: CoverageData) -> String
+fn generate_file_detail_report(view: FileCoverageView, coverage_data: CoverageData) -> String
+fn generate_file_rows(views: @list.List[FileCoverageView], coverage_data: CoverageData) -> String
+fn generate_file_details(views: @list.List[FileCoverageView]) -> String
+fn generate_line_coverage(view: FileCoverageView) -> String
+fn escape_html(text: String) -> String
+fn split_path(path: String) -> (String, String)
+fn format_percentage(percentage: Double) -> String
+fn calculate_line_coverage(view: FileCoverageView) -> (Int, Int)
+fn calculate_view_coverage(view: FileCoverageView) -> Double
+fn generate_main_report(views: @list.List[FileCoverageView], coverage_data: CoverageData) -> String
+fn get_point_execution(data: CoverageData, file: String, start: Int, end: Int) -> Option[Int]
+fn get_file_points(data: CoverageData, file: String) -> @list.List[CoveragePoint]
+fn get_file_coverage(data: CoverageData, file: String) -> Option[Double]
+fn get_overall_coverage(data: CoverageData) -> Double
+fn export_to_csv(data: CoverageData) -> String
+fn parse_bisect(input: String) -> Result[CoverageData, String]
+fn merge_coverage(a: CoverageData, b: CoverageData) -> CoverageData
+fn merge_file_coverage(a: FileCoverage, b: FileCoverage) -> Result[FileCoverage, String]
 fn build_line_map(source : String) -> @list.List[LineMapEntry]
 fn map_to_line_view(
   data : CoverageData,
   source_files : Map[String, String],
 ) -> @list.List[FileCoverageView]
-fn merge_coverage(a: CoverageData, b: CoverageData) -> CoverageData
-fn merge_file_coverage(a: FileCoverage, b: FileCoverage) -> Result[FileCoverage, String]
-fn parse_bisect(input: String) -> Result[CoverageData, String]
-fn get_point_execution(data: CoverageData, file: String, start: Int, end: Int) -> Option[Int]
-fn get_file_points(data: CoverageData, file: String) -> @list.List[CoveragePoint]
-fn get_file_coverage(data: CoverageData, file: String) -> Option[Double]
-fn get_overall_coverage(data: CoverageData) -> Double
-fn generate_html_report(views: @list.List[FileCoverageView], overall_coverage: Double) -> String
-fn calculate_view_coverage(view: FileCoverageView) -> Double 
-fn serialize_bisect(data: CoverageData) -> String
-fn read_coverage_file(path: String) -> Result[CoverageData, String]
-fn load_source_files(data: CoverageData, source_dir: String) -> Map[String, String]
-fn save_report(report_html: String, output_path: String) -> Result[Unit, String]
-fn ensure_output_dir_exists(output_path: String) -> Result[Unit, String]
+
+
 // Type aliases
 
 // Traits
