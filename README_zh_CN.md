@@ -38,24 +38,11 @@ moon run main coverage.lcov src/ reports/
 ```
 
 ## ⚙️ 参数说明
-# 参数说明
-示例
-
-<coverage_path>
-
-Bisect 覆盖率文件路径
-
-coverage.lcov
-
-<source_dir>
-
-源代码目录
-
-src/
-
-<output_dir>
-
-报告输出目录
+| 参数          | 说明                 | 示例值        |
+|---------------|----------------------|--------------|
+| coverage_path | Bisect 覆盖率文件路径 | coverage.lcov |
+| source_dir    | 源代码目录           | src/         |
+| output_dir    | 报告输出目录         | reports/     |
 
 reports/
 
